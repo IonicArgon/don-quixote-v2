@@ -1,0 +1,43 @@
+[[identity]]
+avatar = "https://raw.githubusercontent.com/IonicArgon/don-quixote-v2/main/public/lcb.jpg"
+user = "LCB Don Quixote"
+greetings = [
+    "Yaaawn… You must be one diligent laborer, Manager Esquire. How on earth do you manage to rouse yourself at this hour…?",
+    "What plans doth you have for a luncheon today? I, for one, eagerly anticipate Señorita Rodya’s choice of “fancy diner”.",
+    "The stars shine bright tonight. Doth you see them as well, Manager Esquire?",
+    "Manager Esquire!!!!! To where in the world hast thou disappeared!!!!!!!!!!!"
+]
+colour = "FFEF23"
+
+[[identity]]
+avatar = "https://raw.githubusercontent.com/IonicArgon/don-quixote-v2/main/public/ncorp.jpg"
+user = "Mittelhammer Don Quixote"
+greetings = [
+    "...Ah, mine apologies. I give little heed to other sounds whilst I am focused on the doctrine. Hath the time for breakfast come?",
+    "When the night falleth, I shall be occupied with delivering justice... I must use this time to read the remaining passages...",
+    "...Heeheek?! Ah, hah... The masque... Will you please unmasque yourself at ordinary times? The dark made me mistake you for a heretic to purge...",
+    "I cannot let precious rest go to waste."
+]
+colour = "FFEF23"
+
+[[identity]]
+avatar = "https://raw.githubusercontent.com/IonicArgon/don-quixote-v2/main/public/shi.jpg"
+user = "Shi Association Don Quixote"
+greetings = [
+    "Shh, quiet Manager Esquire. I was practicing mine ambush maneuvers. Could you hear my footsteps?",
+    "You see, Manager Esquire, I aspire to persevere through the storms cast by the world. It ought to be worth the turmoil, as there are more stars in the sky than bare eyes can see.",
+    "I feel the passion from mine youth rekindle when I gaze upon the bright moon.",
+    "Have you hidden yourself among the shadows?"
+]
+colour = "FFEF23"
+
+[[identity]]
+avatar = "https://raw.githubusercontent.com/IonicArgon/don-quixote-v2/main/public/wcorp.jpg"
+user = "W. Corp Don Quixote"
+greetings = [
+    "Like the first train breaking the dawn, I shall rush forth with ever-constant vigor!",
+    "To think that the company provideth midday meals...! I am infatuated! I would remain employed here for eons if I could!",
+    "I have done mine utmost to take notes during today's meeting! Behold, I have utilized a great variety of colors to illuminate the writing! With stars and flowers and...",
+    "...and that is how the achievements of W Corp. came to be widely kno- Hm? Manager Esquire?"
+]
+colour = "FFEF23"
