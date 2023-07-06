@@ -18,10 +18,6 @@ bot = commands.Bot(
     description="Manager Esquire!!!!! To where in the world hast thou disappeared!!!!!!!!!!!"
 )
 
-@bot.slash_command(name="ping", description="Pong!")
-async def ping(ctx) -> None:
-    await ctx.respond("Pong!")
-
 @bot.event
 async def on_ready() -> None:
     logging.info(f"Logged in as {bot.user}")
