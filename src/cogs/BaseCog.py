@@ -10,7 +10,7 @@ from collections import deque
 
 class BaseCog(commands.Cog):
     # static variables
-    identity_config = toml.load("identity_config.toml")
+    identity_config = toml.load("Identity_config.toml")
     config = toml.load("config.toml")
     identities = []
     identity_history = None
@@ -34,7 +34,7 @@ class BaseCog(commands.Cog):
         await self.bot.wait_until_ready()
         logging.info("Reloading config")
 
-        BaseCog.identity_config = toml.load("identity_config.toml")
+        BaseCog.identity_config = toml.load("Identity_config.toml")
         BaseCog.configs = toml.load("config.toml")
         BaseCog.identities = self._load_identities()
         BaseCog.identity_history = deque(maxlen=(len(self.identities) // 2))
