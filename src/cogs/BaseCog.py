@@ -75,7 +75,7 @@ class BaseCog(commands.Cog):
         webhook = discord.utils.get(webhooks, name="Don Quixote Webhook")
         if webhook is None:
             avatar = None
-            with open("../public/icon.png", "rb") as f:
+            with open("./public/icon.png", "rb") as f:
                 avatar = bytearray(f.read())
 
             webhook = await channel.create_webhook(

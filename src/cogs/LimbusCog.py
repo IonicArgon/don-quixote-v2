@@ -59,7 +59,7 @@ class LimbusCog(BaseCog):
                         while random_voice == self.previous_voice:
                             random_voice = random.choice(range(1, 5))
                         self.previous_voice = random_voice
-                        source_ = f"../public/{random_voice}.wav"
+                        source_ = f"./public/{random_voice}.wav"
 
                         voice_client.play(
                             discord.FFmpegPCMAudio(
