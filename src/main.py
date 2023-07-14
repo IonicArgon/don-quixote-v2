@@ -28,5 +28,5 @@ async def on_ready() -> None:
 
 
 if __name__ == "__main__":
-    bot.load_extension("cogs.BaseCog")
+    bot.load_extension("cogs.LimbusCog")
     bot.run(TOKEN)

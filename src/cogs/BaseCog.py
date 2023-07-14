@@ -1,31 +1,49 @@
 import toml
 import logging
+import random
 import discord
-from discord.ext import commands
+import typing
+from discord.ext import commands, tasks
 from Identity import Identity, IdentityProfile
+from collections import deque
 
 
 class BaseCog(commands.Cog):
     # static variables
-    identityConfig = toml.load("IdentityConfig.toml")
-    configs = toml.load("config.toml")
+    identity_config = toml.load("identity_config.toml")
+    config = toml.load("config.toml")
     identities = []
+    identity_history = None
+    member_storage = []
+    channels = []
+    GAME = "limbus"
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        if len(self.identities) == 0:
-            self._load_identities()
+        if len(BaseCog.identities) == 0:
+            BaseCog.identities = self._load_identities()
+            BaseCog.identity_history = deque(maxlen=(len(self.identities) // 2))
+
+        if len(self.channels) == 0:
+            BaseCog.channels = self._load_channels()
 
     # events
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        logging.info(f'Loaded cog "{self.qualified_name}"')
+    @tasks.loop(hours=1)
+    async def reload_config(self) -> None:
+        await self.bot.wait_until_ready()
+        logging.info("Reloading config")
+
+        BaseCog.identity_config = toml.load("identity_config.toml")
+        BaseCog.configs = toml.load("config.toml")
+        BaseCog.identities = self._load_identities()
+        BaseCog.identity_history = deque(maxlen=(len(self.identities) // 2))
+        BaseCog.channels = self._load_channels()
 
     # helper functions
 
-    def _load_identities(self):
-        profiles = self.identityConfig["identity"]
+    def _load_identities(self) -> list[Identity]:
+        profiles = BaseCog.identity_config["identity"]
         profiles = [
             IdentityProfile(
                 avatar=profile["avatar"],
@@ -35,7 +53,7 @@ class BaseCog(commands.Cog):
             )
             for profile in profiles
         ]
-        self.identities = [Identity(profile) for profile in profiles]
+        return [Identity(profile) for profile in profiles]
 
     def _create_base_embed(
         self, title: str, description: str, identity: Identity
@@ -52,24 +70,30 @@ class BaseCog(commands.Cog):
 
         return embed
 
-    async def _establish_ctx_webhook(
-        self, ctx: discord.ApplicationContext
+    async def _establish_webhook(
+        self, channel: discord.TextChannel
     ) -> discord.Webhook:
-        webhooks = await ctx.channel.webhooks()
-        webhook = discord.utils.get(webhooks, name="Don Quixote")
+        webhooks = await channel.webhooks()
+        webhook = discord.utils.get(webhooks, name="Don Quixote Webhook")
         if webhook is None:
-            webhook = await ctx.channel.create_webhook(name="Don Quixote")
+            avatar = None
+            with open("../public/icon.png", "rb") as f:
+                avatar = bytearray(f.read())
+
+            webhook = await channel.create_webhook(
+                name="Don Quixote Webhook", avatar=avatar
+            )
         return webhook
 
-    async def _send_ctx_webhook(
+    async def _send_webhook(
         self,
-        ctx: discord.ApplicationContext,
+        channel: discord.TextChannel,
         identity: Identity,
         embed: discord.Embed,
         view: discord.ui.View = None,
         persistent: bool = True,
     ) -> None:
-        webhook = await self._establish_ctx_webhook(ctx)
+        webhook = await self._establish_webhook(channel)
         if view is not None:
             await webhook.send(
                 username=identity.user,
@@ -87,22 +111,106 @@ class BaseCog(commands.Cog):
         if not persistent:
             await webhook.delete()
 
-    # test
+    def _random_identity(self) -> Identity:
+        identity = random.choice(BaseCog.identities)
+        while identity in BaseCog.identity_history:
+            identity = random.choice(BaseCog.identities)
+        BaseCog.identity_history.append(identity)
+        return identity
+
+    def _load_channels(
+        self,
+    ) -> list[tuple[discord.Guild, discord.TextChannel, discord.VoiceChannel]]:
+        channels = []
+
+        for guild in self.bot.guilds:
+            text_channels = guild.text_channels
+            voice_channels = guild.voice_channels
+
+            channel = None
+            voice = None
+
+            for guild_config in BaseCog.config["guilds"]:
+                if guild_config["id"] == guild.id:
+                    channel = discord.utils.get(text_channels, id=guild_config["text"])
+                    voice = discord.utils.get(voice_channels, id=guild_config["voice"])
+                    break
+
+            if channel is None or voice is None:
+                channel, voice = text_channels[0], voice_channels[0]
+
+            channels.append((guild, channel, voice))
+
+        logging.info(f"Channels: {channels}")
+        return channels
+
+    async def _member_gen(
+        self, guild: discord.Guild
+    ) -> typing.AsyncGenerator[discord.Member, None]:
+        async for member in guild.fetch_members(limit=None):
+            yield member
+
+    def check_member_activity(self, member: discord.Member) -> bool:
+        if len(member.activities) == 0:
+            return False
+
+        for activity in member.activities:
+            if (
+                self.GAME in activity.name.lower()
+                and activity.type == discord.ActivityType.playing
+            ):
+                if member not in BaseCog.member_storage:
+                    BaseCog.member_storage.append(member)
+                    return True
+                else:
+                    return False
+
+        if member in self.member_storage:
+            BaseCog.member_storage.remove(member)
+        
+        return False
+
+    # tests
 
     @commands.slash_command(
-        name="test",
-        description="Test cycle through identities",
+        name="cycleidentities",
+        description="cycle through identities"
     )
-    async def test(self, ctx: discord.ApplicationContext) -> None:
-        for identity in self.identities:
+    async def cycleidentities(self, ctx: discord.ApplicationContext) -> None:
+        await ctx.response.defer()
+        for identity in BaseCog.identities:
             embed = self._create_base_embed(
-                title=f"MANAGER ESQUIRE {ctx.author.display_name}!!!!!!",
+                title=f"Identity: {identity.user}",
                 description=identity.create_greeting(),
                 identity=identity,
             )
-            await self._send_ctx_webhook(ctx, identity, embed)
+            await self._send_webhook(ctx.channel, identity, embed)
+        await ctx.respond("Done cycling through identities")
 
-        await ctx.respond("\u200b", ephemeral=True, delete_after=0.1)
+    @commands.slash_command(
+        name="randidentity",
+        description="get x number of random identities"
+    )
+    async def randidentity(
+        self,
+        ctx: discord.ApplicationContext,
+        number: discord.Option(
+            int,
+            description="number of random identities to get",
+            default=1,
+            required=False,
+        ),
+    ) -> None:
+        await ctx.response.defer()
+        for i in range(number):
+            identity = self._random_identity()
+            embed = self._create_base_embed(
+                title=f"Identity {i}: {identity.user}",
+                description=f"`Generated greeting:` {identity.create_greeting()}",
+                identity=identity,
+            )
+            await self._send_webhook(ctx.channel, identity, embed)
+        await ctx.respond("Done getting random identities")
 
 
 def setup(bot: commands.Bot) -> None:
