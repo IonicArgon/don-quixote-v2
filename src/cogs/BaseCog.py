@@ -70,9 +70,7 @@ class BaseCog(commands.Cog):
 
         return embed
 
-    async def _establish_webhook(
-        self, channel: discord.TextChannel
-    ) -> discord.Webhook:
+    async def _establish_webhook(self, channel: discord.TextChannel) -> discord.Webhook:
         webhooks = await channel.webhooks()
         webhook = discord.utils.get(webhooks, name="Don Quixote Webhook")
         if webhook is None:
@@ -167,50 +165,8 @@ class BaseCog(commands.Cog):
 
         if member in self.member_storage:
             BaseCog.member_storage.remove(member)
-        
+
         return False
-
-    # tests
-
-    @commands.slash_command(
-        name="cycleidentities",
-        description="cycle through identities"
-    )
-    async def cycleidentities(self, ctx: discord.ApplicationContext) -> None:
-        await ctx.response.defer()
-        for identity in BaseCog.identities:
-            embed = self._create_base_embed(
-                title=f"Identity: {identity.user}",
-                description=identity.create_greeting(),
-                identity=identity,
-            )
-            await self._send_webhook(ctx.channel, identity, embed)
-        await ctx.respond("Done cycling through identities")
-
-    @commands.slash_command(
-        name="randidentity",
-        description="get x number of random identities"
-    )
-    async def randidentity(
-        self,
-        ctx: discord.ApplicationContext,
-        number: discord.Option(
-            int,
-            description="number of random identities to get",
-            default=1,
-            required=False,
-        ),
-    ) -> None:
-        await ctx.response.defer()
-        for i in range(number):
-            identity = self._random_identity()
-            embed = self._create_base_embed(
-                title=f"Identity {i}: {identity.user}",
-                description=f"`Generated greeting:` {identity.create_greeting()}",
-                identity=identity,
-            )
-            await self._send_webhook(ctx.channel, identity, embed)
-        await ctx.respond("Done getting random identities")
 
 
 def setup(bot: commands.Bot) -> None:
