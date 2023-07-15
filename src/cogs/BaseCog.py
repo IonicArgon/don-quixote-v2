@@ -75,7 +75,7 @@ class BaseCog(commands.Cog):
         webhook = discord.utils.get(webhooks, name="Don Quixote Webhook")
         if webhook is None:
             avatar = None
-            with open("./public/icon.png", "rb") as f:
+            with open("../public/icon.png", "rb") as f:
                 avatar = bytearray(f.read())
 
             webhook = await channel.create_webhook(
@@ -148,7 +148,9 @@ class BaseCog(commands.Cog):
         async for member in guild.fetch_members(limit=None):
             yield member
 
-    def check_member_activity(self, member: discord.Member) -> bool:
+    def check_member_activity(
+        self, member: discord.Member, guild: discord.Guild
+    ) -> bool:
         if len(member.activities) == 0:
             return False
 
@@ -157,14 +159,14 @@ class BaseCog(commands.Cog):
                 self.GAME in activity.name.lower()
                 and activity.type == discord.ActivityType.playing
             ):
-                if member not in BaseCog.member_storage:
-                    BaseCog.member_storage.append(member)
+                if (member, guild) not in BaseCog.member_storage:
+                    BaseCog.member_storage.append((member, guild))
                     return True
                 else:
                     return False
 
         if member in self.member_storage:
-            BaseCog.member_storage.remove(member)
+            BaseCog.member_storage.remove((member, guild))
 
         return False
 

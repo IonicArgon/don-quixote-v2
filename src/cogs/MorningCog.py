@@ -34,7 +34,7 @@ class MorningCog(BaseCog):
             if self.current_hour == self.morning_hour:
                 self.announced_morning = True
 
-                for _, channel, _ in BaseCog.channels:
+                for guild, channel, _ in BaseCog.channels:
                     identity = self._random_identity()
                     embed = self._create_base_embed(
                         title="VALOROUS MORNING!!!",

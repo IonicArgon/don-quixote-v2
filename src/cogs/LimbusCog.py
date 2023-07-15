@@ -40,7 +40,7 @@ class LimbusCog(BaseCog):
                 if member.bot:
                     continue
 
-                if self.check_member_activity(member):
+                if self.check_member_activity(member, guild):
                     identity = self._random_identity()
                     embed = self._create_base_embed(
                         title=f"MANAGER ESQUIRE {member.name.upper()}!!!",
@@ -59,7 +59,7 @@ class LimbusCog(BaseCog):
                         while random_voice == self.previous_voice:
                             random_voice = random.choice(range(1, 5))
                         self.previous_voice = random_voice
-                        source_ = f"./public/{random_voice}.wav"
+                        source_ = f"../public/{random_voice}.wav"
 
                         voice_client.play(
                             discord.FFmpegPCMAudio(
