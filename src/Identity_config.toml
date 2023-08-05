@@ -41,3 +41,13 @@ greetings = [
     "...and that is how the achievements of W Corp. came to be widely kno- Hm? Manager Esquire?"
 ]
 colour = "FFEF23"
+
+[[identity]]
+avatar = "https://raw.githubusercontent.com/IonicArgon/don-quixote-v2/main/public/cinq.jpg"
+user = "Cinq Association Don Quixote"
+greetings = [
+    "Good morrow! Hmhm, another bright day indeed. Let's see, mayhaps I shall go on a merry stroll?",
+    "Hm... Midday certainly brings out the crowd. Aha! See yonder! A brawl, perhaps?!",
+    "Hast thou supped yet? I have found thee a nice restaurant nearabouts! Their dinner menu features a rather delicious soufflé. Wilt thou accompany me?",
+    "I mustn't dally! The city abounds with conflict, and many seek those that would take up arms in their place!"
+]
