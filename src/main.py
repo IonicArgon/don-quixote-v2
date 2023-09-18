@@ -34,3 +34,5 @@ if __name__ == "__main__":
             cog = cog.replace(".py", "")
             bot.load_extension(f"cogs.{cog}")
     bot.run(TOKEN)
+
+# test commit to check git
